@@ -1,0 +1,81 @@
+image: amazonlinux
+
+pipelines:
+  branches:
+    DE-1555:  # Ensure correct branch name here
+      - step:
+          name: Setup AWS CLI, Install Java 17, and Upload Files to S3
+          script:
+            # Install AWS CLI
+            - yum install -y aws-cli
+
+            # Install Java 17 (since Java 11 is unavailable in Amazon Linux 2023)
+            - dnf install -y java-17-amazon-corretto  # Amazon Corretto is recommended for AWS services
+
+            # Debugging: Check Java version
+            - java -version
+
+            # Install the PostgreSQL JDBC driver
+            - curl -O https://jdbc.postgresql.org/download/postgresql-42.5.0.jar
+            - mv postgresql-42.5.0.jar /usr/local/lib/
+
+            # Debugging: Check if AWS credentials are available
+            - echo "Checking AWS environment variables..."
+            - echo "AWS_ACCESS_KEY is set to: ${AWS_ACCESS_KEY:+(hidden)}"
+            - echo "AWS_SECRET_ACCESS_KEY is set to: ${AWS_SECRET_ACCESS_KEY:+(hidden)}"
+            - echo "AWS_REGION is set to: ${AWS_REGION}"
+
+            # Setup AWS credentials
+            - echo "Configuring AWS CLI..."
+            - aws configure set aws_access_key_id "$AWS_ACCESS_KEY"
+            - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+            - aws configure set default.region "$AWS_REGION"
+            - aws configure list  # Verify AWS configuration
+
+            # Upload files to S3
+            - echo "Uploading files to S3..."
+            - aws s3 cp "$sparkscript" s3://uexpertlyrecords/script/
+            - aws s3 cp "$scriptjson" s3://uexpertlyrecords/config/
+
+      - step:
+          name: Deploy Step Function for DEV
+          script:
+            - echo "Downloading Step Function JSON from S3..."
+            - aws s3 cp s3://uexpertlyrecords/config/StepFunction.json ./StepFunction.json
+            
+            - echo "Creating Step Function..."
+            - aws stepfunctions create-state-machine --name "EMRServerlessStepFunction" \
+                --role-arn "arn:aws:iam::537124961883:role/Stepfunction_01" \
+                --definition file://StepFunction.json
+
+            - echo "Starting Step Function execution..."
+            - aws stepfunctions start-execution --state-machine-arn "arn:aws:states:us-east-1:537124961883:stateMachine:EMRServerlessStepFunction"
+
+            - echo "Checking execution status..."
+            - aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:537124961883:stateMachine:EMRServerlessStepFunction"
+
+      - step:
+          name: Setup PostgreSQL JDBC Connection
+          script:
+            # Set up PostgreSQL connection details from environment variables
+            - echo "Setting up PostgreSQL connection..."
+            - export PGHOST="$POSTGRES_HOST"
+            - export PGUSER="$POSTGRES_USER"
+            - export PGPASSWORD="$POSTGRES_PASSWORD"
+            - export PGDATABASE="$POSTGRES_DB"
+            - export PGPORT="$POSTGRES_PORT"
+            - echo "PostgreSQL environment variables set."
+
+            # Debugging: Check if PostgreSQL JDBC driver is available
+            - ls -l /usr/local/lib/postgresql-42.5.0.jar
+
+            # Establish JDBC connection to PostgreSQL
+            - echo "Connecting to PostgreSQL..."
+            - java -cp /usr/local/lib/postgresql-42.5.0.jar:. \
+                -Djdbc.url="jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE" \
+                -Djdbc.user="$PGUSER" \
+                -Djdbc.password="$PGPASSWORD" \
+                -Djdbc.driver="org.postgresql.Driver" \
+                -Djdbc.classpath="/usr/local/lib/postgresql-42.5.0.jar" \
+                -Djdbc.query="SELECT * FROM my_table;" \
+                -jar your-java-app.jar  # Adjust this to run your actual Java application

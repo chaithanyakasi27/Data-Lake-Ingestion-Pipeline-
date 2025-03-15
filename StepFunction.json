@@ -1,0 +1,92 @@
+{
+  "Comment": "Run Spark application using Amazon EMR Serverless with SNS notifications for success and failure to SQS",
+  "StartAt": "EMR Serverless CreateApplication",
+  "States": {
+    "EMR Serverless CreateApplication": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::emr-serverless:createApplication.sync",
+      "Parameters": {
+        "Name": "ApplicationName_EMRStepFunction",
+        "ReleaseLabel": "emr-7.6.0",
+        "Type": "SPARK",
+        "NetworkConfiguration": {
+          "SubnetIds": [
+            "subnet-056876a6216ff2208",
+            "subnet-0ada8c70d139b9242"
+          ],
+          "SecurityGroupIds": [
+            "sg-01fe3016590dcbdf0",
+            "sg-0ebe530c94f18ae5d",
+            "sg-00718975f449db9b0"
+          ]
+        }
+      },
+      "ResultPath": "$.emr",
+      "Next": "EMR Serverless StartApplication"
+    },
+    "EMR Serverless StartApplication": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::emr-serverless:startApplication.sync",
+      "Parameters": {
+        "ApplicationId.$": "$.emr.ApplicationId"
+      },
+      "ResultPath": null,
+      "Next": "EMR Serverless StartJobRun"
+    },
+    "EMR Serverless StartJobRun": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::emr-serverless:startJobRun.sync",
+      "Parameters": {
+        "ApplicationId.$": "$.emr.ApplicationId",
+        "ExecutionRoleArn": "arn:aws:iam::537124961883:role/Stepfunction_01",
+        "JobDriver": {
+          "SparkSubmit": {
+            "EntryPoint": "s3://uexpertlyrecords/script/Sparkscript.py",
+            "EntryPointArguments": [
+              "argument_1",
+              "argument_2"
+            ],
+            "SparkSubmitParameters": "--jars s3://uexpertlyrecords/jar/postgresql-42.7.5.jar --conf spark.hadoop.hive.metastore.client.factory.class=com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+          }
+        },
+        "ConfigurationOverrides": {
+          "MonitoringConfiguration": {
+            "S3MonitoringConfiguration": {
+              "LogUri": "s3://uexpertlyrecords/logs/"
+            }
+          }
+        }
+      },
+      "ResultPath": "$.jobRun",
+      "Next": "SuccessNotification",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "FailureNotification"
+        }
+      ]
+    },
+    "SuccessNotification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:537124961883:StepFunctionDataPipelineNotification",
+        "Message": "Spark Job completed successfully",
+        "Subject": "Success Notification"
+      },
+      "End": true
+    },
+    "FailureNotification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:537124961883:failurejob",
+        "Message": "Spark Job failed",
+        "Subject": "Failure Notification"
+      },
+      "End": true
+    }
+  }
+}
