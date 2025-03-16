@@ -3,7 +3,7 @@
 ## **Project Overview**
 This project automates the creation and execution of an AWS EMR Serverless application, which runs a PySpark job to ingest data from a PostgreSQL database (hosted on pgAdmin) into an S3 bucket (raw layer). The entire workflow is orchestrated using AWS Step Functions, ensuring seamless execution and resource management.
 
-![architecture](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/a4648ee86d02f63759e8321d2dd66690e3d2ff0b/project%20images/architecture.jpg)
+![architecture](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/architecture.jpg)
 
 
 [Architecture Link](https://lucid.app/lucidchart/a9535ec7-ba9e-40c7-98c4-9836e920a7d9/edit?invitationId=inv_2dc9ef0f-af75-4e5f-ae7e-1dcf676f56fa)
@@ -28,7 +28,7 @@ This project automates the creation and execution of an AWS EMR Serverless appli
        - `script/`: For storing the PySpark script (`Sparkscript.py`).
        - `raw-layer/`: For storing the processed data ingested from PostgreSQL.
    
-![S3 Bucket](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/a4648ee86d02f63759e8321d2dd66690e3d2ff0b/project%20images/S3_bucket.jpg)
+![S3 Bucket](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/S3_bucket.jpg)
 
 *Figure: S3 Bucket*  
 
@@ -37,16 +37,12 @@ This project automates the creation and execution of an AWS EMR Serverless appli
 ## **Scripts and IAM Roles**
 Before executing the EMR Serverless workflow, a PySpark script is used to extract, transform, and load (ETL) data from a PostgreSQL database to an Amazon S3 bucket. The script follows these key steps:
 
-![IAM ROLES](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/a4648ee86d02f63759e8321d2dd66690e3d2ff0b/project%20images/IAM_user.jpg)
+![IAM ROLES](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/IAM_user.jpg)
 
 *Figure: IAM ROLE*
 
 ### **1. Secrets Management**
 The script retrieves AWS credentials and PostgreSQL credentials from AWS Secrets Manager for secure access.
-
-![Secrets](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/625d67d374197a7bef5ebc4dec3eead8096769de/project%20images/secrets.jpg)
-
-*Figure: Secrets Manager*
 
 - **AWS credentials** include the access key, secret key, and region.
 - **PostgreSQL credentials** include the host, username, password, database name, and port.
@@ -90,7 +86,7 @@ Once the data is successfully written to S3, the Spark session is stopped to rel
 - **Queue URL**: [SQS URL](https://sqs.us-east-1.amazonaws.com/537124961883/stepfunction_datapipeline)
 - **Dead-letter Queue**: Not configured (optional)
 
-![SQS Queue](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/SQS.jpg)
+![SQS Queue](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/SQS.jpg)
 
 *Figure: SQS Queue*
 
@@ -126,7 +122,7 @@ Once the data is successfully written to S3, the Spark session is stopped to rel
 ### Step 1: Create an SNS Topic
 
 1. **Sign in to the AWS Console**:
-   - Visit the [AWS SNS Console](https://console.aws.amazon.com/sns).
+   - Visit the [AWS SNS Console](https://console.aws.amazon.com/sns)
 
 2. **Create a New Topic**:
        - Click **Create topic**.
@@ -149,7 +145,7 @@ Once the data is successfully written to S3, the Spark session is stopped to rel
        - Click the confirmation link in the email to activate the subscription.
 
 
-![SQS Queue](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/SNS-subscription_jobsuccess.jpg)
+![SQS Queue](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/SNS-subscription_jobsuccess.jpg)
 
 *Figure: SNS Queue success*
 
@@ -169,7 +165,7 @@ Both are confirmed, meaning you will receive notifications via email and SQS whe
 - **Type**: Standard
 - **Topic Owner**: `537124961883`
 
-![SNS Queue](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/Sns%20Failure.jpg)
+![SNS Queue](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Sns%20Failure.jpg)
 
 *Figure: SnS Queue failure*
 
@@ -177,7 +173,7 @@ Both are confirmed, meaning you will receive notifications via email and SQS whe
 ### Subscriptions:
 - creating subscription job success and failure
 
-![SNS Queue](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/sns_create_subscription_jobfailure.jpg)
+![SNS Queue](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/sns_create_subscription_jobfailure.jpg) 
 
 *Figure: SQS Queue subscription*
 
@@ -193,7 +189,7 @@ You have two confirmed subscriptions for this topic:
        - **Protocol**: `SQS`
        - **Status**: Confirmed
 
-![SNS Queue](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/sns%20topic%20success.jpg)
+![SNS Queue](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/sns%20topic%20success.jpg)
 
 *Figure: SNS Queue subscription*
 
@@ -214,7 +210,7 @@ The pipeline consists of the following steps:
 4. **Stop the EMR Serverless Application**
 The workflow is defined using AWS Step Functions, ensuring each step is executed in sequence and handles errors gracefully.
 
-![EMR SERVERLESS](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/EMR_serverless_application.jpg)
+![EMR SERVERLESS](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/EMR_serverless_application.jpg)
 
 *Figure: EMR SERVERLESS*
 
@@ -237,7 +233,7 @@ SubnetIDS and Security Group IDs I have provided defaults values
   - **ResultPath:** `$.emr`
   - **Next:** `EMR Serverless StartApplication`
 
-![CreateApplication](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/EMR_serverless_application.jpg)
+![CreateApplication](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/EMR_serverless_application.jpg)
 
 *Figure: Create Application*
 
@@ -248,7 +244,7 @@ SubnetIDS and Security Group IDs I have provided defaults values
   - **ApplicationId.$:** `$.emr.ApplicationId`
 - **Next:** `EMR Serverless StartJobRun`
 
-![Start Application](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/EMR_serverless_startapplication.jpg)
+![Start Application](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/EMR_serverless_startapplication.jpg)
 
 *Figure: Start Application*
 
@@ -270,7 +266,7 @@ SubnetIDS and Security Group IDs I have provided defaults values
         - **LogUri:** `s3://uexpertlyrecords/logs/`
 - **Next:** `EMR Serverless StopApplication`
 
-![Start Job run](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/EMR_serverless_StartJobrun.jpg)
+![Start Job run](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/EMR_serverless_StartJobrun.jpg)
 
 *Figure: Start Job Run*
 
@@ -284,7 +280,7 @@ SubnetIDS and Security Group IDs I have provided defaults values
   - **Subject:** `"Success Notification"`  
 - **Next:** `SendMessageToSQS`  
 
-![Success Notification](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/sns_successNotifications.jpg)
+![Success Notification](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/sns_successNotifications.jpg)
 
 *Figure: Success Notification*
 
@@ -302,7 +298,7 @@ SubnetIDS and Security Group IDs I have provided defaults values
 
 ## **Amazon EventBridge:**
 
-![Amazon EventBridge rule](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/Amazon%20eventbridge.jpg)
+![Amazon EventBridge rule](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Amazon%20eventbridge.jpg)
 
 *Figure: EventBridge rule*
 
@@ -352,7 +348,7 @@ IAM_ROLE_ARN="arn:aws:iam::537124961883:role/Amazon_EventBridge_Scheduler_SFN"
 
 ```
 
-![Specify Schedule Detail](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/Schedule_name_and_description_event.jpg)
+![Specify Schedule Detail](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Schedule_name_and_description_event.jpg)
 
 *Figure: Specify Schedule Detail*
 
@@ -400,7 +396,7 @@ aws scheduler create-schedule \
     --region "$AWS_REGION"
 ```
 
-![Select Target](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/select%20target.jpg)
+![Select Target](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/select%20target.jpg)
 
 *Figure: Select Target*
 
@@ -441,7 +437,7 @@ aws scheduler create-schedule \
 aws scheduler list-schedules --region "$AWS_REGION"
 
 ```
-![Configure Settings](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/setting_create_schedule_event.jpg)
+![Configure Settings](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/setting_create_schedule_event.jpg)
 
 *Figure: Configure Settings*
 
@@ -450,7 +446,7 @@ aws scheduler list-schedules --region "$AWS_REGION"
 ``` sh 
 aws scheduler get-schedule --name "$SCHEDULE_NAME" --region "$AWS_REGION"
 ```
-![Review and Create Schedule](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/review%20schedule_event.jpg)
+![Review and Create Schedule](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/review%20schedule_event.jpg)
 
 *Figure: Review and Create Schedule*
 
@@ -482,7 +478,7 @@ aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:
 ## **Output**
 - The processed data is stored in `s3://uexpertlyrecords/raw-layer/`.
 
-![S3 Bucket](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/a4648ee86d02f63759e8321d2dd66690e3d2ff0b/project%20images/Raw_layer.jpg)
+![S3 Bucket](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Raw_layer.jpg)
 
 *Figure: S3 Bucket*
 
@@ -490,7 +486,7 @@ aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:
 
 - EMR logs are stored in `s3://uexpertlyrecords/logs/`.
 
-![Logs](https://bitbucket.org/ivorsource/data-lake-pipelines/raw/a4648ee86d02f63759e8321d2dd66690e3d2ff0b/project%20images/Bucket_Logs.jpg)
+![Logs](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Bucket_Logs.jpg)
 
 *Figure: S3 Bucket logs*
 
@@ -498,11 +494,11 @@ aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:
 
 - If EMR Serverless is succeeded then you will see the green and you will recevied message notificaiton to your subscribed mail.
 
-![Succeded](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/EMR_serverless_success.jpg)
+![Succeded](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/EMR_serverless_success.jpg)
 
 *Figure: Succeded*
 
-![ Mail notification success](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/837d579127acf82218c72098aec52763298ea539/project%20images/Success%20notification%20spark%20job%20success.jpg)
+![ Mail notification success](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/Success%20notification%20spark%20job%20success.jpg)
 
 *Figure: Mail notification success*
 
@@ -510,11 +506,11 @@ aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:
 
 - If EMR Serverless is failure then you will see the green and you will recevied message notificaiton to your subscribed mail.
 
-![Failure](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/SQSnotificationFailure.jpg)
+![Failure](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/SQSnotificationFailure.jpg)
 
 *Figure: Failure*
 
-![ Mail notification failure](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/837d579127acf82218c72098aec52763298ea539/project%20images/AWS%20notification%20message%20job%20failed.jpg)
+![ Mail notification failure](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/AWS%20notification%20message%20job%20failed.jpg)
 
 *Figure: Mail notification failures*
 
@@ -522,7 +518,7 @@ aws stepfunctions list-executions --state-machine-arn "arn:aws:states:us-east-1:
 
 - After creating an EventBridge scheduler task, your task will continue running unless you disable it in the scheduler. You can check the execution list in the Step Functions state machine.
 
-![Execution list](https://bitbucket.org/ivorsource/de-1555-data-lake-ingestion-pipeline/raw/932c20527a2ff014ab057a6601247a66a895f1c3/project%20images/state_machine_job_executions_list.jpg)
+![Execution list](https://raw.githubusercontent.com/chaithanyakasi27/Data-Lake-Ingestion-Pipeline-/refs/heads/main/project%20images/state_machine_job_executions_list.jpg)
 
 *Figure: Execution list*
 
